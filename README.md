@@ -1,5 +1,7 @@
 
 # Clovis users dashboard
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/Clovis-team/clovis-backend-exercise.svg)](https://greenkeeper.io/)
 ![logo](images/logo-clovis.png)
 
 #### Happy to see you there :sunglasses: !
