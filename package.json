@@ -29,7 +29,7 @@
     "eslint": "^4.16.0",
     "eslint-config-clovis": "^1.0.2",
     "mocha": "^5.0.0",
-    "nodemon": "^1.11.0",
+    "nodemon": "^1.18.8",
     "supertest": "^3.0.0"
   }
 }
