@@ -1,38 +1,38 @@
-const _ = require('lodash')
-const supertest = require('supertest')
-const { assert } = require('chai')
+const _ = require('lodash');
+const supertest = require('supertest');
+const { assert } = require('chai');
 
-const db = require('./db')
-const { listen } = require('./app')
+const db = require('./db');
+const { listen } = require('./app');
 
-let server
+let server;
 function request() {
-    return supertest(server)
+    return supertest(server);
 }
 
 function setupApp(server_) {
-    server = server_
+    server = server_;
 }
 
 before(done => {
     listen(4000)
         .then(server_ => {
-            setupApp(server_)
+            setupApp(server_);
         })
-        .then(() => done())
-})
+        .then(() => done());
+});
 
 after(done => {
-    server.close(done)
-})
+    server.close(done);
+});
 
 describe('API', () => {
 
     describe('get list', () => {
-        let users
+        let users;
         beforeEach(async () => {
-            users = db._initDb().data
-        })
+            users = db._initDb().data;
+        });
 
         it('sends all users', async () => {
             await request()
@@ -42,12 +42,12 @@ describe('API', () => {
                     assert.deepEqual(
                         body,
                         users.map(u => _.omit(u, 'password'))
-                    )
-                })
-        })
+                    );
+                });
+        });
 
         it('send all users from a specified city', async () => {
-            const parisian = users.filter(u => u.address.city === 'Paris')
+            const parisian = users.filter(u => u.address.city === 'Paris');
 
             await request()
                 .get('/users/filter?city=Paris')
@@ -56,15 +56,15 @@ describe('API', () => {
                     assert.deepEqual(
                         body,
                         parisian.map(u => _.omit(u, 'password'))
-                    )
-                })
-        })
-    })
+                    );
+                });
+        });
+    });
 
     describe('create', () => {
         beforeEach(async () => {
-            db._initDb()
-        })
+            db._initDb();
+        });
 
         it("doesn't work for with wrong data", async () => {
             await request()
@@ -79,7 +79,7 @@ describe('API', () => {
                         postalCode: 75000,
                     }
                 })
-                .expect(409)
+                .expect(409);
 
             await request()
                 .post('/users')
@@ -93,7 +93,7 @@ describe('API', () => {
                         postalCode: 75000,
                     }
                 })
-                .expect(409)
+                .expect(409);
 
             await request()
                 .post('/users')
@@ -107,8 +107,8 @@ describe('API', () => {
                         postalCode: 75000,
                     }
                 })
-                .expect(409)
-        })
+                .expect(409);
+        });
 
         it("doesn't work if the user already exists", async () => {
             await request()
@@ -123,8 +123,8 @@ describe('API', () => {
                         postalCode: 75000,
                     }
                 })
-                .expect(409)
-        })
+                .expect(409);
+        });
 
         it("doesn't if password is less than 2 character long", async () => {
             await request()
@@ -139,11 +139,11 @@ describe('API', () => {
                         postalCode: 75000,
                     }
                 })
-                .expect(409)
-        })
+                .expect(409);
+        });
 
         it('works', async () => {
-            let id
+            let id;
             const userDoc = {
                 firstName: 'Jean',
                 lastName: 'Perrard',
@@ -153,7 +153,7 @@ describe('API', () => {
                     city: 'Paris',
                     postalCode: 75000,
                 },
-            }
+            };
 
             await request()
                 .post('/users')
@@ -163,12 +163,12 @@ describe('API', () => {
                     assert.deepEqual(
                         _.omit(body, '_id'),
                         _.omit(userDoc, 'password'),
-                    )
+                    );
 
-                    id = body._id
-                })
+                    id = body._id;
+                });
 
-            assert(await db.findById(id))
+            assert(await db.findById(id));
 
             const userDoc2 = {
                 firstName: 'Harry   ',
@@ -179,7 +179,7 @@ describe('API', () => {
                     city: 'Paris   ',
                     postalCode: 75000,
                 },
-            }
+            };
 
             await request()
                 .post('/users')
@@ -198,27 +198,27 @@ describe('API', () => {
                                 postalCode: 75000,
                             },
                         }, 'password'),
-                    )
+                    );
 
-                    id = body._id
-                })
+                    id = body._id;
+                });
 
-            assert(await db.findById(id))
-        })
-    })
+            assert(await db.findById(id));
+        });
+    });
 
     describe('update', () => {
-        let data
+        let data;
         beforeEach(() => {
-            data = db._initDb().data
-        })
+            data = db._initDb().data;
+        });
 
         it("doesn't work if user is not found", async () => {
             await request()
                 .put('/users/id/100')
                 .send({ firstName: 'Alexis' })
-                .expect(404)
-        })
+                .expect(404);
+        });
 
         it('works', async () => {
             await request()
@@ -229,28 +229,28 @@ describe('API', () => {
                     assert.deepEqual(
                         body,
                         _.omit({ ...data[1], firstName: 'David' }, 'password'),
-                    )
-                })
+                    );
+                });
 
-            const newDoc = await db.findById(1)
-            assert(newDoc.firstName === 'David')
-        })
-    })
+            const newDoc = await db.findById(1);
+            assert(newDoc.firstName === 'David');
+        });
+    });
 
     describe('delete', async () => {
         it("doesn't work if user is not found", async () => {
             await request()
                 .delete('/users/id/100')
-                .expect(404)
-        })
+                .expect(404);
+        });
 
 
         it('works', async () => {
             await request()
                 .delete('/users/id/1')
-                .expect(204)
+                .expect(204);
 
-            assert(!await db.findById(1))
-        })
-    })
-})
+            assert(!await db.findById(1));
+        });
+    });
+});

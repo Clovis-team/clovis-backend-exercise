@@ -1,11 +1,11 @@
-const _ = require('lodash')
+const _ = require('lodash');
 
-let data = []
-let idCounter = 0
+let data = [];
+let idCounter = 0;
 
 class dbError {
     constructor(message) {
-        this.message = message
+        this.message = message;
     }
 }
 
@@ -74,82 +74,82 @@ function _initDb() {
     ].map((item, index) => ({
         ...item,
         _id: index,
-    }))
+    }));
 
-    idCounter = data.length
+    idCounter = data.length;
 
     return {
         data,
         idCounter,
-    }
+    };
 }
 
 async function find(criterias = null) {
     if (!criterias) {
-        return data
+        return data;
     }
 
     return data.filter(item => {
         const validate = Object
             .keys(criterias)
             .map(key => {
-                const value = _.get(item, key)
-                return value === undefined ? false : (value === criterias[key])
-            })
+                const value = _.get(item, key);
+                return value === undefined ? false : (value === criterias[key]);
+            });
 
-        return !validate.some(criteria => criteria === false)
-    })
+        return !validate.some(criteria => criteria === false);
+    });
 }
 
 async function findById(id) {
-    id = parseInt(id)
-    return data.find(item => item._id === id)
+    id = parseInt(id);
+    return data.find(item => item._id === id);
 }
 
 async function create(doc) {
     if ('_id' in doc) {
-        throw new dbError('`_id` key must be set by the db engine')
+        throw new dbError('`_id` key must be set by the db engine');
     }
 
     doc = {
         ...doc,
         _id: idCounter,
-    }
+    };
 
-    data.push(doc)
+    data.push(doc);
 
-    idCounter++
+    idCounter++;
 
-    return doc
+    return doc;
 }
 
 async function updateById(id, options) {
-    id = parseInt(id)
-    const docIndex = data.findIndex(item => item._id === id)
+    id = parseInt(id);
+    const docIndex = data.findIndex(item => item._id === id);
 
     if (docIndex === -1) {
-        return false
+        return false;
     }
 
     data[docIndex] = {
         ...data[docIndex],
         ...options,
-    }
+    };
 
-    return true
+    return true;
 }
 
 async function removeById(id) {
-    id = parseInt(id)
-    const docIndex = data.findIndex(item => item._id === id)
+    id = parseInt(id);
+    const docIndex = data.findIndex(item => item._id === id);
 
     if (docIndex === -1) {
-        return false
+        return false;
     }
 
-    data.splice(docIndex, 1)
+    data.splice(docIndex, 1);
 
-    return true
+    return true;
 }
 
 module.exports = {
@@ -160,4 +160,4 @@ module.exports = {
     create,
     updateById,
     removeById,
-}
+};
